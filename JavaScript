@@ -1,0 +1,30 @@
+const itens = {
+  "espada_de_ferro": {
+    nome: "Espada de Ferro",
+    componentes: [
+      { id: "lingote_de_ferro", quantidade: 2 },
+      { id: "graveto", quantidade: 1 }
+    ]
+  },
+  "escudo_de_madeira": {
+    nome: "Escudo de Madeira",
+    componentes: [
+      { id: "madeira", quantidade: 5 },
+      { id: "lingote_de_ferro", quantidade: 1 }
+    ]
+  },
+  "graveto": {
+    nome: "Graveto",
+    componentes: [
+      { id: "madeira", quantidade: 1 }
+    ]
+  },
+  "madeira": {
+    nome: "Madeira",
+    // Sem 'componentes' significa que é um material base
+  },
+  "lingote_de_ferro": {
+    nome: "Lingote de Ferro",
+    // Sem 'componentes' significa que é um material base
+  }
+};
