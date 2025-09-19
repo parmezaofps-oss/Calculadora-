@@ -212,16 +212,30 @@
             box-shadow: 0 0 5px rgba(229, 57, 53, 0.5);
         }
 
-        .botoes-relatorio {
+        .botoes {
+            margin-top: 2rem;
+            width: 100%;
             display: flex;
+            flex-direction: row;
             justify-content: center;
             gap: 1rem;
-            margin-top: 1rem;
         }
-
-        .botoes-relatorio button {
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
+        
+        .botoes button {
+            padding: 1rem 3rem;
+            background-color: var(--cor-principal);
+            color: var(--cor-texto);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 10px var(--cor-principal);
+        }
+        
+        .botoes button:hover {
+            background-color: var(--cor-secundaria);
+            box-shadow: var(--sombra-neon);
         }
 
         #resultado-dinheiro {
@@ -294,7 +308,7 @@
     
     <div class="botoes">
         <button onclick="gerarRelatorio()">Gerar Relatório</button>
-        <button onclick="limparRelatorio()">Limpar Tudo</button>
+        <button onclick="limparTudo()">Limpar Tudo</button>
     </div>
 
     <div id="relatorio" class="secao">
@@ -466,7 +480,7 @@ Suprimentos restantes: ${suprimentosRestantes}
             });
         }
         
-        function limparRelatorio() {
+        function limparTudo() {
             const relatorioDiv = document.getElementById('relatorio');
             const listaItensCriados = document.getElementById('lista-itens-criados');
             
