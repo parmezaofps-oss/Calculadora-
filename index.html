@@ -170,6 +170,59 @@
         .suprimento-info p {
             margin: 0.2rem 0;
         }
+        
+        #relatorio {
+            margin-top: 4rem;
+            padding: 2rem;
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            border: var(--borda-neon);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+            display: none;
+        }
+
+        #relatorio h2 {
+            color: var(--cor-principal);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        #relatorio p, #relatorio ul {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        #relatorio ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #relatorio li {
+            background-color: #333;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: var(--borda-neon);
+            box-shadow: 0 0 5px rgba(229, 57, 53, 0.5);
+        }
+
+        .botoes-relatorio {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .botoes-relatorio button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+        }
 
         #resultado-dinheiro {
             margin-top: 2rem;
@@ -239,6 +292,23 @@
         </div>
     </div>
     
+    <div class="botoes">
+        <button onclick="gerarRelatorio()">Gerar Relatório</button>
+        <button onclick="limparRelatorio()">Limpar Tudo</button>
+    </div>
+
+    <div id="relatorio" class="secao">
+        <h2>Relatório de Produção</h2>
+        <p>Suprimentos brutos iniciais: <span id="relatorio-suprimentos-iniciais"></span></p>
+        <p>Taxa (15%): <span id="relatorio-taxa-suprimento"></span></p>
+        <p>Itens criados:</p>
+        <ul id="lista-itens-criados"></ul>
+        <p>Suprimentos restantes: <span id="relatorio-suprimentos-restantes"></span></p>
+        <div class="botoes-relatorio">
+            <button onclick="copiarRelatorio()">Copiar Relatório</button>
+        </div>
+    </div>
+
     <footer>
         <p>Direitos de propriedade criados por Parmezao D.</p>
     </footer>
@@ -279,9 +349,12 @@
         };
         
         let suprimentosDisponiveis = 0;
+        let suprimentosBrutosIniciais = 0;
+        let taxaSuprimentoValor = 0;
+        const itensCriados = {};
 
         function updateSuprimentoDisplay() {
-            document.getElementById('suprimentos-restantes').textContent = suprimentosDisponiveis.toLocaleString('pt-BR');
+            document.getElementById('suprimentos-restantes').textContent = suprimentosDisponiveis.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         }
 
         function updateQuantity(itemId, change) {
@@ -290,12 +363,13 @@
             let quantidadeAtual = parseInt(quantidadeSpan.textContent, 10);
             const custoPorItem = itens[itemId].componentes[0].quantidade;
             
-            const novoCustoTotal = custoPorItem * change;
-            
             if (change > 0) { // Botão de '+'
-                if (suprimentosDisponiveis >= novoCustoTotal) {
-                    suprimentosDisponiveis -= novoCustoTotal;
+                if (suprimentosDisponiveis >= custoPorItem) {
+                    suprimentosDisponiveis -= custoPorItem;
                     quantidadeAtual += 1;
+                    
+                    itensCriados[itemId] = (itensCriados[itemId] || 0) + 1;
+                    
                     quantidadeSpan.textContent = quantidadeAtual.toLocaleString('pt-BR');
                     updateSuprimentoDisplay();
                 } else {
@@ -303,8 +377,13 @@
                 }
             } else if (change < 0) { // Botão de '-'
                 if (quantidadeAtual > 0) {
-                    suprimentosDisponiveis += Math.abs(novoCustoTotal);
+                    suprimentosDisponiveis += custoPorItem;
                     quantidadeAtual -= 1;
+                    
+                    if (itensCriados[itemId] && itensCriados[itemId] > 0) {
+                        itensCriados[itemId] -= 1;
+                    }
+                    
                     quantidadeSpan.textContent = quantidadeAtual.toLocaleString('pt-BR');
                     updateSuprimentoDisplay();
                 }
@@ -327,6 +406,87 @@
             document.getElementById('taxa-valor').textContent = taxa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             
             document.getElementById('resultado-dinheiro').style.display = 'block';
+        }
+
+        function gerarRelatorio() {
+            const relatorioDiv = document.getElementById('relatorio');
+            const listaItensCriados = document.getElementById('lista-itens-criados');
+            listaItensCriados.innerHTML = '';
+            
+            let temItensNoRelatorio = false;
+            for (const itemId in itensCriados) {
+                if (itensCriados[itemId] > 0) {
+                    temItensNoRelatorio = true;
+                    break;
+                }
+            }
+
+            if (suprimentosBrutosIniciais === 0 && !temItensNoRelatorio) {
+                alert("Nenhum item foi criado e não há suprimentos para gerar o relatório.");
+                relatorioDiv.style.display = 'none';
+                return;
+            }
+
+            document.getElementById('relatorio-suprimentos-iniciais').textContent = suprimentosBrutosIniciais.toLocaleString('pt-BR');
+            document.getElementById('relatorio-taxa-suprimento').textContent = taxaSuprimentoValor.toLocaleString('pt-BR');
+            document.getElementById('relatorio-suprimentos-restantes').textContent = suprimentosDisponiveis.toLocaleString('pt-BR');
+
+            for (const itemId in itensCriados) {
+                if (itensCriados[itemId] > 0) {
+                    const itemNome = itens[itemId].nome;
+                    const quantidadeCriada = itensCriados[itemId];
+                    const li = document.createElement('li');
+                    li.textContent = `${quantidadeCriada.toLocaleString('pt-BR')} x ${itemNome}`;
+                    listaItensCriados.appendChild(li);
+                }
+            }
+            relatorioDiv.style.display = 'flex';
+        }
+        
+        function copiarRelatorio() {
+            const suprimentosIniciais = document.getElementById('relatorio-suprimentos-iniciais').textContent;
+            const taxaSuprimento = document.getElementById('relatorio-taxa-suprimento').textContent;
+            const suprimentosRestantes = document.getElementById('relatorio-suprimentos-restantes').textContent;
+            const listaItens = document.getElementById('lista-itens-criados').innerText;
+            
+            const textoRelatorio = `
+Relatório de Produção:
+Suprimentos brutos iniciais: ${suprimentosIniciais}
+Taxa (15%): ${taxaSuprimento}
+Itens criados:
+${listaItens}
+Suprimentos restantes: ${suprimentosRestantes}
+            `.trim();
+
+            navigator.clipboard.writeText(textoRelatorio).then(() => {
+                alert("Relatório copiado para a área de transferência!");
+            }).catch(err => {
+                console.error('Erro ao copiar o relatório:', err);
+                alert("Não foi possível copiar o relatório. Por favor, copie o texto manualmente.");
+            });
+        }
+        
+        function limparRelatorio() {
+            const relatorioDiv = document.getElementById('relatorio');
+            const listaItensCriados = document.getElementById('lista-itens-criados');
+            
+            listaItensCriados.innerHTML = '';
+            
+            for (const key in itensCriados) {
+                delete itensCriados[key];
+            }
+            
+            suprimentosDisponiveis = 0;
+            suprimentosBrutosIniciais = 0;
+            taxaSuprimentoValor = 0;
+            document.getElementById('suprimentos-disponiveis-input').value = '';
+            
+            document.querySelectorAll('.receita-card .quantidade').forEach(span => {
+                span.textContent = '0';
+            });
+            
+            relatorioDiv.style.display = 'none';
+            updateSuprimentoDisplay();
         }
 
         window.onload = function() {
@@ -357,12 +517,12 @@
             const taxaSuprimentoSpan = document.getElementById('taxa-suprimento-span');
 
             suprimentosInput.addEventListener('input', function() {
-                const valorBruto = parseInt(this.value, 10) || 0;
-                const taxa = valorBruto * 0.15;
-                const valorLiquido = valorBruto - taxa;
+                suprimentosBrutosIniciais = parseInt(this.value, 10) || 0;
+                taxaSuprimentoValor = suprimentosBrutosIniciais * 0.15;
+                const valorLiquido = suprimentosBrutosIniciais - taxaSuprimentoValor;
 
-                valorBrutoSpan.textContent = valorBruto.toLocaleString('pt-BR');
-                taxaSuprimentoSpan.textContent = taxa.toLocaleString('pt-BR');
+                valorBrutoSpan.textContent = suprimentosBrutosIniciais.toLocaleString('pt-BR');
+                taxaSuprimentoSpan.textContent = taxaSuprimentoValor.toLocaleString('pt-BR');
 
                 suprimentosDisponiveis = valorLiquido;
                 if (suprimentosDisponiveis < 0) suprimentosDisponiveis = 0;
