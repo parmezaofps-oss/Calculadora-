@@ -51,6 +51,9 @@
             border-radius: 12px;
             border: var(--borda-neon);
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .secao h2 {
@@ -64,16 +67,21 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 1.5rem;
+            width: 100%;
         }
 
         .receita-card {
             background-color: #1a1a1a;
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1rem;
             transition: transform 0.3s, box-shadow 0.3s;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
             position: relative;
             border: var(--borda-neon);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .receita-card:hover {
@@ -82,13 +90,49 @@
         }
 
         .receita-card h3 {
-            margin-top: 0;
+            margin: 0 0 1rem 0;
             font-size: 1.2rem;
             color: var(--cor-principal);
-            margin-bottom: 1rem;
+            text-align: center;
         }
 
-        .receita-card input[type="number"] {
+        .quantidade-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 0.5rem;
+        }
+
+        .quantidade-control button {
+            background-color: var(--cor-principal);
+            border: none;
+            color: var(--cor-texto);
+            width: 35px;
+            height: 35px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .quantidade-control button:hover {
+            background-color: var(--cor-secundaria);
+        }
+
+        .quantidade-control span {
+            font-size: 1.5rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: var(--cor-texto);
+        }
+
+        .form-group input[type="number"] {
             width: 100%;
             height: 40px;
             background-color: #333;
@@ -99,34 +143,35 @@
             text-align: center;
             font-size: 1rem;
             box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.5rem;
         }
 
-        .botoes {
-            margin-top: 2rem;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        button {
-            padding: 1rem 3rem;
-            background-color: var(--cor-principal);
-            color: var(--cor-texto);
-            border: none;
-            border-radius: 12px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: background-color 0.3s, box-shadow 0.3s;
-            box-shadow: 0 0 10px var(--cor-principal);
-        }
-        
-        button:hover {
-            background-color: var(--cor-secundaria);
+        #suprimento-status {
+            font-size: 1.5rem;
+            margin: 1.5rem 0;
+            padding: 0.5rem 1rem;
+            border: var(--borda-neon);
+            border-radius: 8px;
             box-shadow: var(--sombra-neon);
         }
+        
+        #suprimento-status span {
+            color: var(--cor-texto);
+        }
+        
+        .suprimento-info {
+            font-size: 1rem;
+            color: #ccc;
+            margin-top: 1rem;
+            text-align: left;
+            width: 100%;
+        }
 
-        #resultado-crafting, #resultado-dinheiro {
+        .suprimento-info p {
+            margin: 0.2rem 0;
+        }
+
+        #resultado-dinheiro {
             margin-top: 2rem;
             text-align: left;
             padding: 1rem;
@@ -134,14 +179,6 @@
             box-shadow: var(--sombra-neon);
             border: var(--borda-neon);
             display: none;
-        }
-
-        #resultado-dinheiro {
-            background-color: #1a1a1a;
-        }
-
-        #resultado-crafting {
-            background-color: #1a1a1a;
         }
 
         .resultado-dinheiro p {
@@ -153,23 +190,6 @@
         .resultado-dinheiro span {
             font-weight: bold;
             color: var(--cor-texto);
-        }
-
-        #lista-suprimentos {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        #lista-suprimentos li {
-            padding: 0.8rem 1.5rem;
-            background-color: #333;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            border: var(--borda-neon);
-            box-shadow: 0 0 5px rgba(229, 57, 53, 0.5);
         }
 
         footer {
@@ -185,15 +205,22 @@
     <div class="main-container">
         <div class="secao">
             <h2>Calculadora de Suprimentos</h2>
+            <div class="form-group">
+                <label for="suprimentos-disponiveis-input">Suprimentos brutos que você tem:</label>
+                <input type="number" id="suprimentos-disponiveis-input" min="0">
+            </div>
+            
+            <div id="suprimento-status">
+                Suprimentos líquidos: <span id="suprimentos-restantes">0</span>
+            </div>
+
+            <div class="suprimento-info">
+                <p>Valor bruto: <span id="valor-bruto-span">0</span></p>
+                <p>Taxa (15%): <span id="taxa-suprimento-span">0</span></p>
+            </div>
+
             <div id="receitas-grid">
                 </div>
-            <div class="botoes">
-                <button onclick="calcularTotalSuprimentos()">Calcular Suprimentos</button>
-            </div>
-            <div id="resultado-crafting">
-                <h2>Materiais Necessários:</h2>
-                <ul id="lista-suprimentos"></ul>
-            </div>
         </div>
 
         <div class="secao">
@@ -250,55 +277,38 @@
             nome: "Suprimento",
           }
         };
+        
+        let suprimentosDisponiveis = 0;
 
-        function calcularTotalSuprimentos() {
-            const todasAsReceitas = document.querySelectorAll('.receita-card');
-            const suprimentosFinais = {};
-            let temItensParaCalcular = false;
+        function updateSuprimentoDisplay() {
+            document.getElementById('suprimentos-restantes').textContent = suprimentosDisponiveis.toLocaleString('pt-BR');
+        }
 
-            function obterMateriaisBase(itemId, quantidade) {
-                const item = itens[itemId];
-                if (item && item.componentes) {
-                    item.componentes.forEach(componente => {
-                        obterMateriaisBase(componente.id, componente.quantidade * quantidade);
-                    });
-                } else if (item) {
-                    if (!suprimentosFinais[itemId]) {
-                        suprimentosFinais[itemId] = 0;
-                    }
-                    suprimentosFinais[itemId] += quantidade;
+        function updateQuantity(itemId, change) {
+            const card = document.querySelector(`.receita-card[data-item-id="${itemId}"]`);
+            const quantidadeSpan = card.querySelector('.quantidade');
+            let quantidadeAtual = parseInt(quantidadeSpan.textContent, 10);
+            const custoPorItem = itens[itemId].componentes[0].quantidade;
+            
+            const novoCustoTotal = custoPorItem * change;
+            
+            if (change > 0) { // Botão de '+'
+                if (suprimentosDisponiveis >= novoCustoTotal) {
+                    suprimentosDisponiveis -= novoCustoTotal;
+                    quantidadeAtual += 1;
+                    quantidadeSpan.textContent = quantidadeAtual.toLocaleString('pt-BR');
+                    updateSuprimentoDisplay();
+                } else {
+                    alert('Suprimentos insuficientes para criar este item.');
+                }
+            } else if (change < 0) { // Botão de '-'
+                if (quantidadeAtual > 0) {
+                    suprimentosDisponiveis += Math.abs(novoCustoTotal);
+                    quantidadeAtual -= 1;
+                    quantidadeSpan.textContent = quantidadeAtual.toLocaleString('pt-BR');
+                    updateSuprimentoDisplay();
                 }
             }
-            
-            todasAsReceitas.forEach(card => {
-                const itemSelecionadoId = card.dataset.itemId;
-                const quantidadeDesejada = parseInt(card.querySelector('input[type="number"]').value, 10);
-                
-                if (itemSelecionadoId && !isNaN(quantidadeDesejada) && quantidadeDesejada > 0) {
-                    obterMateriaisBase(itemSelecionadoId, quantidadeDesejada);
-                    temItensParaCalcular = true;
-                }
-            });
-
-            const divResultado = document.getElementById('resultado-crafting');
-            const listaSuprimentos = document.getElementById('lista-suprimentos');
-            listaSuprimentos.innerHTML = '';
-            
-            if (!temItensParaCalcular) {
-                divResultado.style.display = 'none';
-                alert("Por favor, insira uma quantidade válida (> 0) em pelo menos um item.");
-                return;
-            }
-            
-            for (const itemId in suprimentosFinais) {
-                const itemNome = itens[itemId].nome;
-                const quantidadeTotal = suprimentosFinais[itemId];
-                const li = document.createElement('li');
-                li.textContent = `${quantidadeTotal.toLocaleString('pt-BR')} x ${itemNome}`;
-                listaSuprimentos.appendChild(li);
-            }
-
-            divResultado.style.display = 'block';
         }
 
         function calcularDinheiro() {
@@ -327,13 +337,38 @@
                     card.className = 'receita-card';
                     card.dataset.itemId = id;
                     
+                    const custo = itens[id].componentes[0].quantidade.toLocaleString('pt-BR');
+                    
                     card.innerHTML = `
                         <h3>${itens[id].nome}</h3>
-                        <input type="number" min="0">
+                        <small>Custo: ${custo} suprimentos</small>
+                        <div class="quantidade-control">
+                            <button onclick="updateQuantity('${id}', -1)">-</button>
+                            <span class="quantidade">0</span>
+                            <button onclick="updateQuantity('${id}', 1)">+</button>
+                        </div>
                     `;
                     receitasGrid.appendChild(card);
                 }
             }
+            
+            const suprimentosInput = document.getElementById('suprimentos-disponiveis-input');
+            const valorBrutoSpan = document.getElementById('valor-bruto-span');
+            const taxaSuprimentoSpan = document.getElementById('taxa-suprimento-span');
+
+            suprimentosInput.addEventListener('input', function() {
+                const valorBruto = parseInt(this.value, 10) || 0;
+                const taxa = valorBruto * 0.15;
+                const valorLiquido = valorBruto - taxa;
+
+                valorBrutoSpan.textContent = valorBruto.toLocaleString('pt-BR');
+                taxaSuprimentoSpan.textContent = taxa.toLocaleString('pt-BR');
+
+                suprimentosDisponiveis = valorLiquido;
+                if (suprimentosDisponiveis < 0) suprimentosDisponiveis = 0;
+                updateSuprimentoDisplay();
+            });
+            updateSuprimentoDisplay();
         };
     </script>
 </body>
